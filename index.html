@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Gamer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #0a0a0f, #1a0022);
+      font-family: 'Orbitron', sans-serif;
+      color: #00ffcc;
+      overflow: hidden;
+    }
+
+    .login-container {
+      background: rgba(20, 20, 30, 0.9);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 25px #00ffcc;
+      width: 350px;
+      text-align: center;
+    }
+
+    h2 {
+      text-shadow: 0 0 10px #00ffff;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 1.2rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 8px;
+      background: #111;
+      color: #00ffcc;
+      font-size: 1rem;
+      outline: none;
+      box-shadow: inset 0 0 10px #00ffcc;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .input-group input:focus {
+      box-shadow: 0 0 15px #00ffff;
+    }
+
+    button {
+      background: linear-gradient(90deg, #00ffcc, #00ffff);
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #00ffcc;
+    }
+
+    .security-hint {
+      font-size: 0.8rem;
+      color: #ccc;
+      margin-top: 1rem;
+    }
+
+    .error {
+      color: #ff0066;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</style>
+<body>
+  <div class="login-container">
+    <h2>Login Gamer</h2>
+    <form action="login.php" method="POST">
+      <div class="input-group">
+        <input type="text" name="username" placeholder="Usuario" required />
+      </div>
+      <div class="input-group">
+        <input type="password" name="password" placeholder="Contraseña" required />
+      </div>
+      <button type="submit">Entrar</button>
+      <p class="security-hint">⚔️ Protege tu cuenta con una contraseña fuerte</p>
+      <p><a href="registro.php">¿No tienes cuenta? Regístrate aquí</a></p>
+    </form>
+  </div>
+</body>
+</html>
