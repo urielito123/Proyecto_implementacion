@@ -3,34 +3,30 @@ require 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = htmlspecialchars(trim($_POST['username']));
+    $email = htmlspecialchars(trim($_POST['email']));
     $password = $_POST['password'];
-    $recaptcha_secret = "6LcIreUrAAAAAAYkDa67tTKRTu5_XGIq_JesZ-rn"; // tu clave secreta
     $recaptcha_response = $_POST['g-recaptcha-response'];
 
-    // Verificar respuesta del CAPTCHA con Google
+    $recaptcha_secret = "6Le07eUrAAAAALqzpuvjmRShBvHpcxQlQTPmXq6O";
+
     $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptcha_secret&response=$recaptcha_response");
     $responseKeys = json_decode($response, true);
-
     if(!$responseKeys["success"]) {
-        die("<div style='font-family:Orbitron,sans-serif;color:#ff0066;text-align:center;background:#0a0a0f;height:100vh;display:flex;align-items:center;justify-content:center;'>
-        ⚠️ Verificación fallida: demuestra que no eres un robot.<br><a href='registro.php' style='color:#00ffcc;'>Volver</a></div>");
+        die("<div class='msj-error'>⚠️ Verificación fallida: demuestra que no eres un robot.<br><a href='registro.php'>Volver</a></div>");
     }
 
     if (strlen($password) < 8) {
-        die("<div style='font-family:Orbitron,sans-serif;color:#ff0066;text-align:center;background:#0a0a0f;height:100vh;display:flex;align-items:center;justify-content:center;'>
-        ⚠️ La contraseña debe tener al menos 8 caracteres.<br><a href='registro.php' style='color:#00ffcc;'>Volver</a></div>");
+        die("<div class='msj-error'>⚠️ La contraseña debe tener al menos 8 caracteres.</div>");
     }
 
     $password_hash = password_hash($password, PASSWORD_BCRYPT);
 
-    $stmt = $pdo->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)");
     try {
-        $stmt->execute([$username, $password_hash]);
-        echo "<div style='font-family:Orbitron,sans-serif;color:#00ffcc;text-align:center;background:#0a0a0f;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;'>
-        ✅ Usuario registrado con éxito<br><a href='index.html' style='color:#00ffff;text-decoration:none;'>Iniciar sesión</a></div>";
+        $stmt->execute([$username, $email, $password_hash]);
+        echo "<div class='msj-ok'>✅ Usuario registrado con éxito. <a href='index.html'>Iniciar sesión</a></div>";
     } catch (PDOException $e) {
-        echo "<div style='font-family:Orbitron,sans-serif;color:#ff0066;text-align:center;background:#0a0a0f;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;'>
-        ⚠️ Error: El usuario ya existe o los datos son inválidos.<br><a href='registro.php' style='color:#00ffcc;'>Intentar de nuevo</a></div>";
+        echo "<div class='msj-error'>⚠️ Error: el usuario o correo ya existen.<br><a href='registro.php'>Volver</a></div>";
     }
 } else {
 ?>
@@ -39,99 +35,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <title>Registro Gamer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <style>
     body {
-      margin: 0;
-      height: 100vh;
+      background-color: #0e0e0e;
+      font-family: Arial, sans-serif;
+      color: white;
       display: flex;
-      align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at top, #0a0a0f, #1a0022);
-      font-family: 'Orbitron', sans-serif;
-      overflow: hidden;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
     .login-container {
-      background: rgba(15, 15, 25, 0.95);
-      padding: 2.5rem;
-      border-radius: 15px;
-      box-shadow: 0 0 30px #00ffcc;
-      width: 360px;
+      background: #1a1a1a;
+      padding: 30px;
+      width: 350px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.8);
       text-align: center;
-      color: #00ffcc;
-      animation: glow 2s ease-in-out infinite alternate;
-    }
-    @keyframes glow {
-      from { box-shadow: 0 0 20px #00ffff; }
-      to { box-shadow: 0 0 35px #00ffcc; }
     }
     h2 {
-      text-shadow: 0 0 15px #00ffff;
-      margin-bottom: 1.8rem;
-      letter-spacing: 1px;
+      margin-bottom: 20px;
+      color: #ff3b3b;
     }
-    .input-group { margin-bottom: 1.2rem; }
-    input {
+    .input-group input {
       width: 100%;
-      padding: 0.8rem;
+      padding: 10px;
+      margin: 10px 0;
       border: none;
-      border-radius: 8px;
-      background: #111;
-      color: #00ffcc;
-      font-size: 1rem;
-      box-shadow: inset 0 0 10px #00ffcc;
-      outline: none;
-      transition: box-shadow 0.3s;
+      background: #2a2a2a;
+      color: white;
+      border-radius: 5px;
     }
-    input:focus { box-shadow: 0 0 20px #00ffff; }
     button {
-      background: linear-gradient(90deg, #00ffcc, #00ffff);
+      width: 100%;
+      padding: 10px;
+      background: #e60000;
       border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 10px;
-      color: #000;
+      color: white;
       font-weight: bold;
-      font-size: 1rem;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      border-radius: 5px;
+      transition: 0.3s ease;
     }
     button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 25px #00ffff;
-    }
-    .g-recaptcha {
-      margin: 1rem auto;
-      display: flex;
-      justify-content: center;
-      filter: drop-shadow(0 0 10px #00ffff);
+      background: #ff1a1a;
+      box-shadow: 0 0 10px red;
     }
     a {
-      display: inline-block;
-      color: #00ffff;
-      margin-top: 1rem;
+      color: #ff4040;
       text-decoration: none;
-      transition: color 0.3s;
     }
-    a:hover { color: #fff; }
+    a:hover {
+      text-decoration: underline;
+    }
+    .msj-ok, .msj-error {
+      background: black;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .g-recaptcha {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+    }
   </style>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
   <div class="login-container">
-    <h2>Registro Gamer ⚔️</h2>
+    <h2>Registro</h2>
     <form method="POST">
       <div class="input-group">
         <input type="text" name="username" placeholder="Usuario" required />
       </div>
       <div class="input-group">
-        <input type="password" name="password" placeholder="Contraseña" required />
+        <input type="email" name="email" placeholder="Correo electrónico" required />
       </div>
-
-      <!-- reCAPTCHA -->
-      <div class="g-recaptcha" data-sitekey="6LcIreUrAAAAACmNRr0Ki0QDXmE9x8Q0ciQDR5b7"></div>
-
-      <button type="submit">Registrarme</button>
-      <a href="index.html">🔙 Volver al login</a>
+      <div class="input-group">
+        <input type="password" name="password" placeholder="Contraseña (mínimo 8 caracteres)" required />
+      </div>
+      <div class="g-recaptcha" data-sitekey="6Le07eUrAAAAAI0QDzNNN5Hdt4niaVOaliT54_NR"></div>
+      <button type="submit">Crear cuenta</button>
+      <p><a href="index.html">Ya tengo una cuenta</a></p>
     </form>
   </div>
 </body>
